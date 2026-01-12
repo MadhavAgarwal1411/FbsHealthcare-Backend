@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+// User roles enum
+enum Role {
+  admin
+  employee
+}
+
+// User model - stores all user information
+model User {
+  id              Int       @id @default(autoincrement())
+  name            String    @db.VarChar(100)
+  email           String    @unique @db.VarChar(255)
+  phone           String    @db.VarChar(20)
+  password        String    @db.VarChar(255)
+  role            Role      @default(employee)
+  loginStartTime  String?   @map("login_start_time") @db.VarChar(8) // TIME stored as string HH:MM:SS
+  loginEndTime    String?   @map("login_end_time") @db.VarChar(8)   // TIME stored as string HH:MM:SS
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.DateTime(0)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.DateTime(0)
+
+  // Relations
+  loginSessions   LoginSession[]
+
+  @@map("users")
+}
+
+// LoginSession model - tracks user login history
+model LoginSession {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  loginTime   DateTime  @default(now()) @map("login_time") @db.DateTime(0)
+  logoutTime  DateTime? @map("logout_time") @db.DateTime(0)
+  ipAddress   String?   @map("ip_address") @db.VarChar(45)
+  userAgent   String?   @map("user_agent") @db.Text
+  isValid     Boolean   @default(true) @map("is_valid")
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("login_sessions")
+}
