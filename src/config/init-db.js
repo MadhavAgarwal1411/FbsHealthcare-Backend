@@ -39,4 +39,4 @@ const initializeDatabase = async () => {
   await seedAdminUser();
 };
 
-module.exports = { initializeDatabase, seedAdminUser };
+export { initializeDatabase, seedAdminUser };

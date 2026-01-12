@@ -121,7 +121,7 @@ const updateUserValidation = [
   handleValidationErrors,
 ];
 
-module.exports = {
+export {
   registerValidation,
   loginValidation,
   updateUserValidation,

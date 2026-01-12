@@ -7,7 +7,7 @@
 import User from "./User.js";
 import LoginSession from "./LoginSession.js";
 
-module.exports = {
+export {
   User,
   LoginSession,
 };

@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.ts";
+import {prisma} from "../lib/prisma.ts";
 import bcrypt from "bcryptjs";
 
 /**
@@ -223,4 +223,4 @@ const User = {
   },
 };
 
-module.exports = User;
+export default User

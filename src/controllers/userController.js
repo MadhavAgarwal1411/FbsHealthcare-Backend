@@ -277,7 +277,7 @@ const getUserLoginStats = async (req, res) => {
   }
 };
 
-module.exports = {
+const userController = {
   getAllUsers,
   getUserById,
   updateUser,
@@ -286,3 +286,5 @@ module.exports = {
   resetUserPassword,
   getUserLoginStats,
 };
+
+export default userController

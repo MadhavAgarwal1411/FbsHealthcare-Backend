@@ -1,4 +1,4 @@
-import prisma from "../lib/prisma.ts";
+import {prisma} from "../lib/prisma.ts";
 
 /**
  * LoginSession Model - Prisma-based
@@ -179,4 +179,4 @@ const LoginSession = {
   },
 };
 
-module.exports = LoginSession;
+export default LoginSession

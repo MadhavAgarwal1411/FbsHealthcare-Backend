@@ -1,6 +1,6 @@
 import express from 'express';
 const router = express.Router();
-import userController from '../controllers/userController.js';
+import userController from "../controllers/userController.js";
 import { authenticateToken, isAdmin } from '../middleware/auth.js';
 import { updateUserValidation } from '../middleware/validators.js';
 
@@ -19,4 +19,4 @@ router.get('/:id/login-history', userController.getUserLoginHistory);
 // Reset user password
 router.post('/:id/reset-password', userController.resetUserPassword);
 
-module.exports = router;
+export default router;

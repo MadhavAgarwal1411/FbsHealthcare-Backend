@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { User, LoginSession } from "../models/index.js";
+// Changed: Named import for checkLoginTime
 import { checkLoginTime } from "../middleware/auth.js";
 
 /**
@@ -16,18 +17,17 @@ const register = async (req, res) => {
       loginStartTime,
       loginEndTime,
     } = req.body;
-
-    // Check if user already exists
     const existingUser = await User.emailExists(email);
 
     if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User with this email already exists",
-      });
+      return res
+        .status(409)
+        .json({
+          success: false,
+          message: "User with this email already exists",
+        });
     }
 
-    // Create new user (password is auto-hashed by User model)
     const user = await User.create({
       name,
       email,
@@ -38,17 +38,16 @@ const register = async (req, res) => {
       loginEndTime,
     });
 
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      data: user,
-    });
+    res
+      .status(201)
+      .json({
+        success: true,
+        message: "User registered successfully",
+        data: user,
+      });
   } catch (error) {
     console.error("Registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
@@ -61,38 +60,31 @@ const login = async (req, res) => {
     const ipAddress = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers["user-agent"];
 
-    // Find user by email
     const user = await User.findByEmail(email);
-
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
 
-    // Check if user is active
     if (!user.isActive) {
-      return res.status(403).json({
-        success: false,
-        message: "Account has been deactivated. Please contact admin.",
-      });
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message: "Account has been deactivated. Please contact admin.",
+        });
     }
 
-    // Verify password
     const isPasswordValid = await User.verifyPassword(password, user.password);
-
     if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
     }
 
-    // Check login time restrictions for employees
     if (user.role === "employee") {
       const timeCheck = checkLoginTime(user.loginStartTime, user.loginEndTime);
-
       if (!timeCheck.allowed) {
         return res.status(403).json({
           success: false,
@@ -104,19 +96,13 @@ const login = async (req, res) => {
       }
     }
 
-    // Generate JWT token
     const token = jwt.sign(
       { userId: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "24h" }
     );
 
-    // Record login session
-    await LoginSession.create({
-      userId: user.id,
-      ipAddress,
-      userAgent,
-    });
+    await LoginSession.create({ userId: user.id, ipAddress, userAgent });
 
     res.json({
       success: true,
@@ -136,16 +122,10 @@ const login = async (req, res) => {
     });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Get current user profile
- */
 const getProfile = async (req, res) => {
   try {
     res.json({
@@ -163,76 +143,42 @@ const getProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("Get profile error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Logout (invalidate session)
- */
 const logout = async (req, res) => {
   try {
     await LoginSession.endSession(req.user.id);
-
-    res.json({
-      success: true,
-      message: "Logged out successfully",
-    });
+    res.json({ success: true, message: "Logged out successfully" });
   } catch (error) {
     console.error("Logout error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-/**
- * Change password
- */
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
-
-    // Get user with password
     const user = await User.findByEmail(req.user.email);
-
-    // Verify current password
     const isPasswordValid = await User.verifyPassword(
       currentPassword,
       user.password
     );
 
     if (!isPasswordValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Current password is incorrect",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "Current password is incorrect" });
     }
 
-    // Update password
     await User.updatePassword(req.user.id, newPassword);
-
-    res.json({
-      success: true,
-      message: "Password changed successfully",
-    });
+    res.json({ success: true, message: "Password changed successfully" });
   } catch (error) {
     console.error("Change password error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Internal server error",
-    });
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
-module.exports = {
-  register,
-  login,
-  getProfile,
-  logout,
-  changePassword,
-};
+const authController = { register, login, getProfile, logout, changePassword };
+export default authController;
