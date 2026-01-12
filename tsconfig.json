@@ -12,7 +12,6 @@
     "moduleResolution": "node",
     "esModuleInterop": true,
     "ignoreDeprecations": "6.0",
-    "allowImportingTsExtensions": true,
     "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
