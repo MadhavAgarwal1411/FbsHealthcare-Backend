@@ -13,6 +13,11 @@ enum Role {
   employee
 }
 
+enum WithGST {
+  inclusive
+  exclusive
+}
+
 // User model - stores all user information
 model User {
   id             Int      @id @default(autoincrement())
@@ -113,6 +118,11 @@ model Order {
   courierCharges   Decimal?
   advance          Decimal?
   orderRemark      String?
+  withGST          WithGST?
+  paymentType      String?
+  discount         Decimal?
+  stateCode        String?
+  gstRate          String?
 
   @@index([status])
   @@index([assignedToId])
@@ -121,11 +131,13 @@ model Order {
 
 // Individual products inside an order
 model OrderItem {
-  id          Int     @id @default(autoincrement())
-  orderId     Int     @map("order_id")
-  productName String  @db.VarChar(255)
-  quantity    Int
-  price       Decimal @db.Decimal(10, 2)
+  id           Int     @id @default(autoincrement())
+  orderId      Int     @map("order_id")
+  productName  String  @db.VarChar(255)
+  quantity     Int
+  price        Decimal @db.Decimal(10, 2)
+  weight       Decimal @db.Decimal(5, 2)
+  weighingUnit String  @db.VarChar(5)
 
   // Relations
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)

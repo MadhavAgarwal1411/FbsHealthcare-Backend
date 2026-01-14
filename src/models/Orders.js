@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma/client.js";
 import { prisma } from "../lib/prisma.js";
 
 /**
@@ -92,6 +93,17 @@ const Order = {
     totalAmount,
     createdById,
     items = [],
+    // withGST,
+    liveLocation,
+    orderRemark,
+    paymentType,
+    discount,
+    advance,
+    customerAlternatePhone,
+    stateCode,
+    deliveryPartner,
+    gstRate,
+    assignedTo,
   }) {
     return prisma.$transaction(async (tx) => {
       const order = await tx.order.create({
@@ -101,10 +113,21 @@ const Order = {
           customerPhone,
           customerEmail,
           shippingAddress,
-          totalAmount,
           createdById,
           status: "pending",
           paymentStatus: "pending",
+          // withGST,
+          liveLocation,
+          orderRemark,
+          paymentType,
+          totalAmount: new Prisma.Decimal(totalAmount),
+          discount: discount ? new Prisma.Decimal(discount) : null,
+          advance: advance ? new Prisma.Decimal(advance) : null,
+          stateCode,
+          deliveryPartner,
+          gstRate,
+          alternateContact: customerAlternatePhone,
+          assignedToId: assignedTo ? parseInt(assignedTo) : null,
         },
       });
 
@@ -115,6 +138,8 @@ const Order = {
             productName: item.productName,
             quantity: item.quantity,
             price: item.price,
+            weight: item.weight,
+            weighingUnit: item.weighingUnit,
           })),
         });
       }
@@ -143,7 +168,7 @@ const Order = {
       prisma.orderStatusLog.create({
         data: {
           orderId: parseInt(orderId),
-          status: "confirmed",
+          status: "pending",
           note: "Order assigned to employee",
         },
       }),
