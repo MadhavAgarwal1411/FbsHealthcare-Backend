@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import authRoutes from './authRoutes.js';
 import userRoutes from './userRoutes.js';
+import orderRoutes from './order.routes.js';
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -15,5 +16,6 @@ router.get('/health', (req, res) => {
 // Mount routes
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
+router.use('/orders', orderRoutes);
 
 export default router;

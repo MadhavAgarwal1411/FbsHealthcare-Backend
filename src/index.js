@@ -50,6 +50,7 @@ app.get('/', (req, res) => {
       health: '/api/health',
       auth: '/api/auth',
       users: '/api/users',
+      orders: '/api/orders',
     },
   });
 });

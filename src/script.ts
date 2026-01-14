@@ -5,26 +5,15 @@ async function main() {
     data: {
       name: 'Alice',
       email: 'alice@prisma.io',
-      posts: {
-        create: {
-          title: 'Hello World',
-          content: 'This is my first post!',
-          published: true,
-        },
-      },
-    },
-    include: {
-      posts: true,
+      phone: "1234567890",
+      password: "1234",
+      role: "employee",
     },
   })
   console.log('Created user:', user)
 
   // Fetch all users with their posts
-  const allUsers = await prisma.user.findMany({
-    include: {
-      posts: true,
-    },
-  })
+  const allUsers = await prisma.user.findMany()
   console.log('All users:', JSON.stringify(allUsers, null, 2))
 }
 
