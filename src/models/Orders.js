@@ -31,6 +31,70 @@ const Order = {
     });
   },
 
+/**
+   * Update order details
+   * @param {number} id
+   * @param {object} updates
+   */
+  async update(id, updates) {
+    // Allowed fields based on the Prisma 'Order' model
+    const allowedFields = [
+      "customerName",
+      "customerPhone",
+      "shippingAddress",
+      "alternateContact",
+      "stateCode",
+      "totalAmount",
+      "discount",
+      "advance",
+      "courierCharges",
+      "paymentType",
+      "orderRemark",
+      "pipelineRemark",
+      "deliveryPartner",
+      "trackingId",
+      "liveLocation",
+      "gstRate",
+      "withGST",
+      "paymentStatus"
+    ];
+
+    // Fields that require Prisma.Decimal conversion
+    const decimalFields = [
+      "totalAmount", 
+      "discount", 
+      "advance", 
+      "courierCharges"
+    ];
+
+    const data = {};
+
+    for (const [key, value] of Object.entries(updates)) {
+      if (allowedFields.includes(key)) {
+        // Handle Decimal conversion
+        if (decimalFields.includes(key) && value !== null && value !== undefined) {
+          data[key] = new Prisma.Decimal(value);
+        } else {
+          data[key] = value;
+        }
+      }
+    }
+
+    if (Object.keys(data).length === 0) return null;
+
+    return prisma.order.update({
+      where: { id: parseInt(id) },
+      data,
+      // Include relations to keep frontend data consistent after update
+      include: {
+        items: true,
+        assignedTo: {
+          select: { id: true, name: true },
+        },
+      },
+    });
+  },
+
   /**
    * Find order by order number
    * @param {string} orderNumber
@@ -93,7 +157,7 @@ const Order = {
     totalAmount,
     createdById,
     items = [],
-    // withGST,
+    withGST,
     liveLocation,
     orderRemark,
     paymentType,
@@ -114,9 +178,9 @@ const Order = {
           customerEmail,
           shippingAddress,
           createdById,
-          status: "pending",
+          status: "Pending",
           paymentStatus: "pending",
-          // withGST,
+          withGST,
           liveLocation,
           orderRemark,
           paymentType,
@@ -147,7 +211,7 @@ const Order = {
       await tx.orderStatusLog.create({
         data: {
           orderId: order.id,
-          status: "pending",
+          status: "Pending",
           note: "Order created",
         },
       });
@@ -168,7 +232,7 @@ const Order = {
       prisma.orderStatusLog.create({
         data: {
           orderId: parseInt(orderId),
-          status: "pending",
+          status: "Pending",
           note: "Order assigned to employee",
         },
       }),
