@@ -51,6 +51,7 @@ app.get('/', (req, res) => {
       auth: '/api/auth',
       users: '/api/users',
       orders: '/api/orders',
+      leads: '/api/leads',
     },
   });
 });

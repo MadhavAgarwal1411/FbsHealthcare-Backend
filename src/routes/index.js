@@ -3,6 +3,7 @@ const router = express.Router();
 import authRoutes from './authRoutes.js';
 import userRoutes from './userRoutes.js';
 import orderRoutes from './order.routes.js';
+import leadRoutes from './lead.routes.js'
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -17,5 +18,6 @@ router.get('/health', (req, res) => {
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/orders', orderRoutes);
+router.use('/leads', leadRoutes)
 
 export default router;
